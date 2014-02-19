@@ -1,0 +1,65 @@
+
+Vagrant.configure("2") do |config|
+
+
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  config.vm.box = "precise32"
+  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+  #config.vm.share_folder "app", "/home/vagrant/app", "app"
+
+  # Tomcat forwarded port
+  config.vm.network :forwarded_port, guest: 8080, host: 4880
+
+  # Nginx forwarded port
+  config.vm.network :forwarded_port, guest: 80, host: 8000
+
+  config.vm.provision :chef_solo do |chef|
+    chef.log_level = "debug"
+
+    chef.provisioning_path = "/tmp/vagrant-chef-solo"
+    chef.file_cache_path = chef.provisioning_path
+
+    chef.json = {
+      'nvm' => {
+          'install' => {
+              'version' => '0.10.22'
+          }
+      },
+      'nodejs' => {
+          'version' => '0.10.22'
+      },
+      'java' => {
+          'jdk_version' => '7'
+      }
+    }
+
+    chef.run_list = [
+      'recipe[apt]',
+      'recipe[build-essential]',
+      'recipe[ark]',
+      'recipe[git::default]',
+      'recipe[vim]',
+      #'recipe[chef-dotfiles::bash_it]',
+      'recipe[tmux]',
+      'recipe[ant]',
+      'recipe[maven]',
+      'recipe[nvm]',
+      'recipe[nodejs]',
+      'recipe[ruby_build::default]',
+      'recipe[java::default]',
+      'recipe[openssl]',
+      'recipe[tomcat::default]'
+    ]
+
+  end
+
+  #config.vm.provision :shell, :inline => "sudo apt-get install -y build-essential --no-install-recommends"
+  #config.vm.provision :shell, :inline => "sudo apt-get install -y redis-server --no-install-recommends"
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  end
+end

@@ -1,0 +1,42 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: ubuntu-13.04
+    run_list:
+    - recipe[apt::default]
+  - name: ubuntu-12.04
+    run_list:
+    - recipe[apt::default]
+  - name: ubuntu-10.04
+    run_list:
+    - recipe[apt::default]
+  - name: debian-7.2.0
+    run_list:
+    - recipe[apt::default]
+  - name: debian-6.0.8
+    run_list:
+    - recipe[apt::default]
+  - name: centos-6.5
+  - name: centos-5.10
+
+suites:
+ - name: client
+   run_list:
+   - recipe[nagios::client]
+ - name: server
+   run_list:
+   - recipe[nagios::server]
+   attributes:
+     roles:
+     - monitoring
+     nagios:
+       additional_contacts:
+         root: true
+data_bags_path: test/data_bags
+roles_path: test/roles
+
