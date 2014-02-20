@@ -1,0 +1,50 @@
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  config.vm.box = "centos65"
+  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.1/centos65-x86_64-20131205.box"
+  #config.vm.share_folder "app", "/home/vagrant/app", "app"
+
+  # install chef on the VM
+  config.omnibus.chef_version = :latest
+
+  # Tomcat forwarded port
+  config.vm.network :forwarded_port, guest: 8080, host: 8080
+
+  # Nginx forwarded port
+  #config.vm.network :forwarded_port, guest: 80, host: 8000
+
+  config.vm.provision :chef_solo do |chef|
+    chef.log_level = "debug"
+
+    chef.provisioning_path = "/tmp/vagrant-chef-solo"
+    chef.file_cache_path = chef.provisioning_path
+
+    chef.json = {
+      'java' => {
+          'jdk_version' => '7'
+      }
+    }
+
+    chef.run_list = [
+      'recipe[network-tomcat::default]',
+      'recipe[devtools]',
+      'recipe[ant]',
+      'recipe[maven]',
+      'recipe[tomcat]'
+    ]
+
+  end
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  end
+end
