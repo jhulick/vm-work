@@ -1,0 +1,9 @@
+{
+  "run_list": [
+    "recipe[apt]",
+    "recipe[ark]",
+    "recipe[maven]",
+    "recipe[java::default]",
+    "recipe[tomcat::default]"
+  ]
+}
