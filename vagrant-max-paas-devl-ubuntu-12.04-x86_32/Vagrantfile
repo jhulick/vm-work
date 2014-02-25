@@ -54,6 +54,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       },
       'java' => {
           'jdk_version' => '7'
+      },
+      'mysql' => {
+          'server_root_password' => 'Password@1',
+          'server_repl_password' => 'Password@1',
+          'server_debian_password' => 'Password@1'
       }
     }
 
@@ -72,7 +77,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'recipe[ruby_build::default]',
       'recipe[java::default]',
       'recipe[openssl]',
-      'recipe[tomcat::default]'
+      'recipe[tomcat::default]',
+      'recipe[mysql::server]'
     ]
 
   end
