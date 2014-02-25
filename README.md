@@ -1,26 +1,26 @@
-# [MAX PaaS](http://max-paas.devl.netspective.com/max-paas-harness/#/) VMs for Development and Server
+## [MAX PaaS](http://max-paas.devl.netspective.com/max-paas-harness/#/) VMs for Development and Server
 
 A better system provisioning workflow with Chef and Vagrant.
 
 Chef and Vagrant represents a huge improvement in time, efficiency and management of developing, running and deploying
 projects.
 
-## Tools for the new workflow
+### Tools for the new workflow
 You should already have VirtualBox, Chef and Vagrant installed and Configured. You will also need to install a ruby
 version manager (RVM/rbenv) and the following gems: veewee, berkshelf and bundler (optional). Hopefully the following
 will explain the what and why being using these tools. note that as of writing veewee requires ruby 1.9.2 and berkshelf
 requires ruby 1.9.3.
 
-# Chef
+### Chef
 Chef is a powerful tool and that power is provided through a few chef-isms. Recipes, attributes, LWRPs, cookbooks, roles,
 nodes, data bags.
 
-# Berkshelf
+### Berkshelf
 Berkshelf provides the solution to writing a cookbook in isolation, and lets you pull in 3rd party cookbooks from any
 location whether that be Opscode, a git repository or even your local filesystem. When you pull in those dependencies,
 they stay separate from your cookbook just as with ruby gems, or npm.
 
-# Veewee
+### Veewee
 To get a custom box ready to be provisioned by Vagrant, there are a few hoops to jump through in terms of setting up software
 (chef, ssh, nfs, a vagrant user etc.). This can all be set up manually, but that is not very repeatable and does not
 feel very chef-y.
@@ -31,7 +31,7 @@ for Veewee are well documented in the repository.
 
 
 
-## Installation
+### Installation
 
   With [Vagrant](http://http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) previously installed:
 
@@ -40,7 +40,7 @@ for Veewee are well documented in the repository.
      $ vagrant up
 
 
-## Features
+### Features
 
   - Apache
   - Java 7
@@ -52,7 +52,7 @@ for Veewee are well documented in the repository.
   - Git
   - Tmux
 
-## Links
+### Links
 
  - [VirtualBox](https://www.virtualbox.org/)
  - [Vagrant](http://http://www.vagrantup.com/)
