@@ -43,19 +43,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :puppet do |puppet|
 
+    puppet.working_directory = "/tmp/vagrant-puppet/manifests"
     puppet.manifests_path = "puppet/manifests"
     puppet.module_path = "puppet/modules"
     puppet.manifest_file  = "init.pp"
-    puppet.options = "--verbose --debug"
+    puppet.options = "--debug --verbose --modulepath /vagrant/puppet/modules"
 
   end
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", "1024"]
-    disk1, disk2 = "tmp/disk-#{Time.now.to_f}.vdi", "tmp/disk-#{Time.now.to_f}.vdi"
-    vb.customize ["createhd", "--filename", disk1, "--size", 250]
-    vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1,"--type", "hdd", "--medium", disk1]
-    vb.customize ["createhd", "--filename", disk2, "--size", 250]
-    vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 2,"--type", "hdd", "--medium", disk2]
+    #disk1, disk2 = "tmp/disk-#{Time.now.to_f}.vdi", "tmp/disk-#{Time.now.to_f}.vdi"
+    #vb.customize ["createhd", "--filename", disk1, "--size", 250]
+    #vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1,"--type", "hdd", "--medium", disk1]
+    #vb.customize ["createhd", "--filename", disk2, "--size", 250]
+    #vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 2,"--type", "hdd", "--medium", disk2]
   end
 end

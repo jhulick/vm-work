@@ -1,14 +1,13 @@
-exec { 'apt_update':
-  command => 'apt-get update',
-  path    => '/usr/bin'
+exec { 'yum update':
+  command => '/usr/bin/yum update -y';
 }
 
 class { 'devtools': }
-class { 'java': }
+class { 'stdlib::stages': }
+class { 'wget': }
+class { 'java': version => 'present'}
 class { 'ant': }
 class { 'maven': }
-class { 'apache2': }
 class { 'tomcat': }
 class { 'nodejs': }
-class { 'postgresql': }
-class { 'iptables': }
+class { 'postgresql::server': }
