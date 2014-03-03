@@ -13,7 +13,7 @@
 #   include devtools
 #
 class devtools(
-  $manage_epel    = true,
+  $manage_epel    = false,
   $package_ensure = latest,
 ) {
 
