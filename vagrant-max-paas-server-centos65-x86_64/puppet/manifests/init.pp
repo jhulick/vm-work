@@ -9,5 +9,6 @@ class { 'ant::install': }
 class { 'maven::install': }
 class { 'apache2::install': }
 class { 'tomcat::install': }
+class { 'nodejs::install': }
 class { 'postgresql::install': }
 class { 'iptables::install': }
