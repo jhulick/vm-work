@@ -24,103 +24,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "centos65"
+  config.vm.box = "centos-65-x64-virtualbox-puppet"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.1/centos65-x86_64-20131205.box"
+  config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-puppet.box"
   #config.vm.share_folder "app", "/home/vagrant/app", "app"
 
-  # install chef on the VM
-  config.omnibus.chef_version = :latest
 
   # Tomcat forwarded port
-  #config.vm.network :forwarded_port, guest: 8080, host: 8080
+  config.vm.network :forwarded_port, guest: 8080, host: 8080
 
   # private network
-  config.vm.network :private_network, ip: '33.33.33.11'
-
-
+  #config.vm.network :private_network, ip: '33.33.33.11'
 
   # Nginx forwarded port
   #config.vm.network :forwarded_port, guest: 80, host: 8000
 
-  config.vm.provision :chef_solo do |chef|
-    chef.log_level = "debug"
+  config.vm.provision :puppet do |puppet|
 
-    chef.provisioning_path = "/tmp/vagrant-chef-solo"
-    chef.data_bags_path    = './tmp/data_bags'
-    chef.file_cache_path = chef.provisioning_path
-
-    chef.berkshelf.enabled = true if Vagrant::VERSION > '1.1'
-
-    chef.json = {
-      :java => {
-          :install_flavor => "openjdk",
-          :jdk_version    => "7"
-      },
-      :elasticsearch => {
-          :cluster => { :name => "elasticsearch_vagrant" },
-
-          :plugins => {
-              'karmi/elasticsearch-paramedic' => {
-                  :url => 'https://github.com/karmi/elasticsearch-paramedic/archive/master.zip'
-              }
-          },
-
-          :limits => {
-              :nofile  => 1024,
-              :memlock => 512
-          },
-
-          :logging => {
-              :discovery => 'TRACE',
-              'index.indexing.slowlog' => 'INFO, index_indexing_slow_log_file'
-          },
-
-          :nginx => {
-              :user  =>  'www-data',
-              :users => [{ username: 'USERNAME', password: 'PASSWORD' }]
-          },
-          # For testing flat attributes:
-          "index.search.slowlog.threshold.query.trace" => "1ms",
-          # For testing deep attributes:
-          :discovery => { :zen => { :ping => { :timeout => "9s" } } },
-          # For testing custom configuration
-          :custom_config => {
-              'threadpool.index.type' => 'fixed',
-              'threadpool.index.size' => '2'
-          },
-          :path => {
-              :data => "/usr/local/var/data/elasticsearch/disk1"
-          },
-          :data => {
-              :devices => {
-                  "/dev/sdb" => {
-                      :file_system => "ext3",
-                      :mount_options => "rw,user",
-                      :mount_path => "/usr/local/var/data/elasticsearch/disk1",
-                      :format_command => "mkfs.ext3 -F",
-                      :fs_check_command => "dumpe2fs"
-                  }
-              }
-          },
-          :nginx => {
-              :user => 'nginx'
-          }
-      }
-    }
-
-    chef.run_list = [
-      'recipe[network-tomcat::default]',
-      'recipe[devtools]',
-      'recipe[ant]',
-      'recipe[maven]',
-      'recipe[tomcat]',
-      'recipe[elasticsearch]',
-      'recipe[elasticsearch::proxy]',
-      'recipe[elasticsearch::data]'
-    ]
+    puppet.manifests_path = "puppet/manifests"
+    puppet.module_path = "puppet/modules"
+    puppet.manifest_file  = "init.pp"
+    puppet.options = "--verbose --debug"
 
   end
 

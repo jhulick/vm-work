@@ -1,0 +1,133 @@
+
+# Launch and provision multiple Linux distributions with Vagrant <http://vagrantup.com>
+#
+# Support:
+#
+# * centos6:     CentOS 6.5 64 bit (primary server box)
+#
+# See:
+#
+#   $ vagrant status
+#
+# The virtual machines are automatically provisioned upon startup with Chef-Solo
+# <http://vagrantup.com/v1/docs/provisioners/chef_solo.html>.
+
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = "centos65"
+
+  # The url from where the 'config.vm.box' box will be fetched if it
+  # doesn't already exist on the user's system.
+  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.1/centos65-x86_64-20131205.box"
+  #config.vm.share_folder "app", "/home/vagrant/app", "app"
+
+  # install chef on the VM
+  config.omnibus.chef_version = :latest
+
+  # Tomcat forwarded port
+  #config.vm.network :forwarded_port, guest: 8080, host: 8080
+
+  # private network
+  config.vm.network :private_network, ip: '33.33.33.11'
+
+  # Nginx forwarded port
+  #config.vm.network :forwarded_port, guest: 80, host: 8000
+
+  config.vm.provision :chef_solo do |chef|
+    chef.log_level = "debug"
+
+    chef.provisioning_path = "/tmp/vagrant-chef-solo"
+    chef.data_bags_path    = './tmp/data_bags'
+    chef.file_cache_path = chef.provisioning_path
+
+    chef.berkshelf.enabled = true if Vagrant::VERSION > '1.1'
+
+    chef.json = {
+      :java => {
+          :install_flavor => "openjdk",
+          :jdk_version    => "7"
+      },
+      :elasticsearch => {
+          :cluster => { :name => "elasticsearch_vagrant" },
+
+          :plugins => {
+              'karmi/elasticsearch-paramedic' => {
+                  :url => 'https://github.com/karmi/elasticsearch-paramedic/archive/master.zip'
+              }
+          },
+
+          :limits => {
+              :nofile  => 1024,
+              :memlock => 512
+          },
+
+          :logging => {
+              :discovery => 'TRACE',
+              'index.indexing.slowlog' => 'INFO, index_indexing_slow_log_file'
+          },
+
+          :nginx => {
+              :user  =>  'www-data',
+              :users => [{ username: 'USERNAME', password: 'PASSWORD' }]
+          },
+          # For testing flat attributes:
+          "index.search.slowlog.threshold.query.trace" => "1ms",
+          # For testing deep attributes:
+          :discovery => { :zen => { :ping => { :timeout => "9s" } } },
+          # For testing custom configuration
+          :custom_config => {
+              'threadpool.index.type' => 'fixed',
+              'threadpool.index.size' => '2'
+          },
+          :path => {
+              :data => "/usr/local/var/data/elasticsearch/disk1"
+          },
+          :data => {
+              :devices => {
+                  "/dev/sdb" => {
+                      :file_system => "ext3",
+                      :mount_options => "rw,user",
+                      :mount_path => "/usr/local/var/data/elasticsearch/disk1",
+                      :format_command => "mkfs.ext3 -F",
+                      :fs_check_command => "dumpe2fs"
+                  }
+              }
+          },
+          :nginx => {
+              :user => 'nginx'
+          }
+      }
+    }
+
+    chef.run_list = [
+      'recipe[network-tomcat::default]',
+      'recipe[devtools]',
+      'recipe[ant]',
+      'recipe[maven]',
+      'recipe[tomcat]',
+      'recipe[elasticsearch]',
+      'recipe[elasticsearch::proxy]',
+      'recipe[elasticsearch::data]'
+    ]
+
+  end
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    disk1, disk2 = "tmp/disk-#{Time.now.to_f}.vdi", "tmp/disk-#{Time.now.to_f}.vdi"
+    vb.customize ["createhd", "--filename", disk1, "--size", 250]
+    vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1,"--type", "hdd", "--medium", disk1]
+    vb.customize ["createhd", "--filename", disk2, "--size", 250]
+    vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 2,"--type", "hdd", "--medium", disk2]
+  end
+end
