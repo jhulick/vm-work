@@ -3,12 +3,12 @@ exec { 'apt_update':
   path    => '/usr/bin'
 }
 
-class { 'devtools::install': }
-class { 'java::install': }
-class { 'ant::install': }
-class { 'maven::install': }
-class { 'apache2::install': }
-class { 'tomcat::install': }
-class { 'nodejs::install': }
-class { 'postgresql::install': }
-class { 'iptables::install': }
+class { 'devtools': }
+class { 'java': }
+class { 'ant': }
+class { 'maven': }
+class { 'apache2': }
+class { 'tomcat': }
+class { 'nodejs': }
+class { 'postgresql': }
+class { 'iptables': }
