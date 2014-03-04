@@ -4,7 +4,7 @@
 class max::needed_software {
 
    # CentOS libyaml-devel install
-   exec { 'installing Development Tools and libyaml-devl':
+   exec { 'installing Development Tools':
       command => '/usr/bin/yum -y groupinstall "Development Tools" ',
    }
 
@@ -15,8 +15,9 @@ class max::needed_software {
     } ->
     exec { 'install epel-release-6-8.noarch':
       command => "/bin/rpm -Uvh /home/vagrant/remi-release-6*.rpm /home/vagrant/epel-release-6*.rpm",
-    } ->
-    exec {
-      command => "yum install libyaml-devel"
+    }
+
+    exec { 'installing libyaml-devl':
+      command => "yum install libyaml-devel",
     }
 }
