@@ -37,7 +37,11 @@ for Veewee are well documented in the repository.
 
      $ git clone https://github.com/jhulick/vm-work
      $ cd vm-work/vagrant-max-paas-devl-ubuntu-12.04-x86_32
-     $ cd bootstrap or mkdir bootstrap if not created
+     $ cd bootstrap/max-paas
+     $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-paas-harness.git
+     $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-forms.git
+     $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-grids.git
+     $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-navigation.git
      $ vagrant up
 
 
