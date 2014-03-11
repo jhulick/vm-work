@@ -3,7 +3,8 @@
 
 
 .DS_Store
-.vagrant
+vagrant-max-paas/devl-ubuntu-12.04-x86_32/.vagrant
+vagrant-max-paas/devl-ubuntu-12.04-x86_32/.cache
 .vagrant-1
 .vagrant-2
 Berksfile.lock
