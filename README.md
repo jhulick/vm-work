@@ -37,12 +37,13 @@ for Veewee are well documented in the repository.
 
      $ git clone https://github.com/jhulick/vm-work
      $ cd vm-work/vagrant-max-paas-devl-ubuntu-12.04-x86_32
+     $ cd bootstrap or mkdir bootstrap if not created
      $ vagrant up
 
 
 ### Features
 
-  - Apache
+  - Nginx
   - Java 7
   - Tomcat 7
   - Ant
