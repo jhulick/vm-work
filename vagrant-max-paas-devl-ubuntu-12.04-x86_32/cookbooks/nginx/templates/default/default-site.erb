@@ -26,27 +26,5 @@ server {
   }
 }
 
-server {
-          listen       8084;
-          server_name  localhost;
 
-        location / {
-             root   /Users/jeremyhulick/projects/max/max-paas/max-paas-harness;
-              index  index.html;
-              autoindex on;
-          }
-
-          location /max-forms {
-             alias /Users/jeremyhulick/projects/max/max-paas/max-forms;·
-             autoindex on;
-         }
-         location /max-grids {
-             alias /Users/jeremyhulick/projects/max/max-paas/max-grids;
-             autoindex on;
-         }
-         location /max-navigation {
-             alias /Users/jeremyhulick/projects/max/max-paas/max-navigation;
-             autoindex on;
-         }
-     }
 
