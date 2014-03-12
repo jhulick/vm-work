@@ -59,6 +59,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           'server_root_password' => 'Password@1',
           'server_repl_password' => 'Password@1',
           'server_debian_password' => 'Password@1'
+      },
+      'elasticsearch' => {
+          'cluster' => { 'name' => 'elasticsearch_max_paas' },
+          'plugins' => {
+            'karmi/elasticsearch-paramedic' => {},
+            'lukas-vlcek/bigdesk'           => { 'version' => '1.0.0' }
+          }
       }
     }
 
@@ -80,6 +87,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'recipe[java::default]',
       'recipe[openssl]',
       'recipe[tomcat::default]',
+      'recipe[elasticsearch]',
       'recipe[mysql::server]'
     ]
 
