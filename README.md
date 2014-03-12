@@ -31,7 +31,7 @@ for Veewee are well documented in the repository.
 
 
 
-### Installation
+### Developer Ubuntu Installation
 
   With [Vagrant](http://http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) previously installed:
 
@@ -42,6 +42,14 @@ for Veewee are well documented in the repository.
      $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-forms.git
      $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-grids.git
      $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-navigation.git
+     $ vagrant up
+
+### Server CentOS Installation
+
+  With [Vagrant](http://http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) previously installed:
+
+     $ git clone https://github.com/jhulick/vm-work
+     $ cd vm-work/vagrant-max-paas-server-centos65-x86_32
      $ vagrant up
 
 
