@@ -17,38 +17,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['platform'] == "ubuntu" && node['platform_version'].to_f == 8.04
+if node['platform'] == 'ubuntu' && node['platform_version'].to_f == 8.04
   log "Ubuntu 8.04 does not supply sufficient development libraries via APT to install CouchDB #{node['couch_db']['src_version']} from source."
   return
 end
 
-include_recipe "erlang"
+couchdb_tar_gz = File.join(Chef::Config[:file_cache_path], '/', "apache-couchdb-#{node['couch_db']['src_version']}.tar.gz")
+compile_flags = ''
+dev_pkgs = []
 
-couchdb_tar_gz = File.join(Chef::Config[:file_cache_path], "/", "apache-couchdb-#{node['couch_db']['src_version']}.tar.gz")
-compile_flags = String.new
-dev_pkgs = Array.new
+case node['platform_family']
+when 'debian'
 
-case node['platform']
-when "debian", "ubuntu"
-
-  dev_pkgs << "libicu-dev"
-  dev_pkgs << "libcurl4-openssl-dev"
+  dev_pkgs << 'libicu-dev'
+  dev_pkgs << 'libcurl4-openssl-dev'
   dev_pkgs << value_for_platform(
-    "debian" => { "default" => "libmozjs-dev" },
-    "ubuntu" => {
-      "9.04" => "libmozjs-dev",
-      "9.10" => "libmozjs-dev",
-      "default" => "xulrunner-dev"
+    'debian' => { 'default' => 'libmozjs-dev' },
+    'ubuntu' => {
+      '10.04' => 'xulrunner-dev',
+      'default' => 'libmozjs-dev'
     }
   )
 
-  dev_pkgs.each do |pkg|
-    package pkg
-  end
+when 'rhel', 'fedora'
+  include_recipe 'yum-epel'
 
-  if node['platform_version'].to_f >= 10.04
-    compile_flags = "--with-js-lib=/usr/lib/xulrunner-devel-1.9.2.8/lib --with-js-include=/usr/lib/xulrunner-devel-1.9.2.8/include"
-  end
+  dev_pkgs += %w{
+    which make gcc js-devel libtool
+    libicu-devel openssl-devel curl-devel
+  }
+
+  # awkwardly tell ./configure where to find Erlang's headers
+  bitness = node['kernel']['machine'] =~ /64/ ? 'lib64' : 'lib'
+  compile_flags = "--with-erlang=/usr/#{bitness}/erlang/usr/include"
+end
+
+include_recipe 'erlang::esl' if node['couch_db']['install_erlang']
+
+dev_pkgs.each do |pkg|
+  package pkg
 end
 
 remote_file couchdb_tar_gz do
@@ -62,33 +69,43 @@ bash "install couchdb #{node['couch_db']['src_version']}" do
     tar -zxf #{couchdb_tar_gz}
     cd apache-couchdb-#{node['couch_db']['src_version']} && ./configure #{compile_flags} && make && make install
   EOH
-  not_if { ::FileTest.exists?("/usr/local/bin/couchdb") }
+  not_if "test -f /usr/local/bin/couchdb && /usr/local/bin/couchdb -V | grep 'Apache CouchDB #{node['couch_db']['src_version']}'"
 end
 
-user "couchdb" do
-  home "/usr/local/var/lib/couchdb"
-  comment "CouchDB Administrator"
+user 'couchdb' do
+  home '/usr/local/var/lib/couchdb'
+  comment 'CouchDB Administrator'
   supports :manage_home => false
   system true
 end
 
-%w{ var/lib/couchdb var/log/couchdb var/run etc/couchdb }.each do |dir|
+%w{ var/lib/couchdb var/log/couchdb var/run/couchdb etc/couchdb }.each do |dir|
   directory "/usr/local/#{dir}" do
-    owner "couchdb"
-    group "couchdb"
-    mode "0770"
+    owner 'couchdb'
+    group 'couchdb'
+    mode '0770'
   end
 end
 
-# was owner/group root/root
-cookbook_file "/etc/init.d/couchdb" do
-  source "couchdb.init"
-  owner "vagrant"
-  group "vagrant"
-  mode "0755"
+template '/usr/local/etc/couchdb/local.ini' do
+  source 'local.ini.erb'
+  owner 'couchdb'
+  group 'couchdb'
+  mode 0660
+  variables(
+    :config => node['couch_db']['config']
+  )
+  notifies :restart, 'service[couchdb]'
 end
 
-service "couchdb" do
-  supports [ :restart, :status ]
+cookbook_file '/etc/init.d/couchdb' do
+  source 'couchdb.init'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+service 'couchdb' do
+  supports [:restart, :status]
   action [:enable, :start]
 end

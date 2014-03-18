@@ -17,58 +17,61 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "erlang"
+include_recipe 'erlang::esl' if node['couch_db']['install_erlang']
 
-case node['platform']
-when "redhat","centos","fedora","amazon"
-  group "couchdb" do
+case node['platform_family']
+when 'rhel'
+  group 'couchdb' do
     system true
   end
 
-  user "couchdb" do
-    comment "Couchdb Database Server"
-    gid "couchdb"
-    shell "/bin/bash"
-    home "/var/lib/couchdb"
+  user 'couchdb' do
+    comment 'Couchdb Database Server'
+    gid 'couchdb'
+    shell '/bin/bash'
+    home '/var/lib/couchdb'
     system true
   end
+
+  include_recipe 'yum-epel'
 end
 
-package "couchdb" do
+package 'couchdb' do
   package_name value_for_platform(
-    "openbsd" => { "default" => "apache-couchdb" },
-    "gentoo" => { "default" => "dev-db/couchdb" },
-    "default" => "couchdb"
-  )
+    'openbsd' => { 'default' => 'apache-couchdb' },
+    'gentoo' => { 'default' => 'dev-db/couchdb' },
+    'default' => 'couchdb'
+    )
 end
 
-template "/etc/couchdb/local.ini" do
-  source "local.ini.erb"
-  owner "couchdb"
-  group "couchdb"
+template '/etc/couchdb/local.ini' do
+  source 'local.ini.erb'
+  owner 'couchdb'
+  group 'couchdb'
   mode 0664
   variables(
-    :bind_address => node['couch_db']['bind_address']
+    :config => node['couch_db']['config']
   )
+  notifies :restart, 'service[couchdb]'
 end
 
-directory "/var/lib/couchdb" do
-  owner "couchdb"
-  group "couchdb"
+directory '/var/lib/couchdb' do
+  owner 'couchdb'
+  group 'couchdb'
   recursive true
   path value_for_platform(
-    "openbsd" => { "default" => "/var/couchdb" },
-    "freebsd" => { "default" => "/var/couchdb" },
-    "gentoo" => { "default" => "/var/couchdb" },
-    "default" => "/var/lib/couchdb"
+    'openbsd' => { 'default' => '/var/couchdb' },
+    'freebsd' => { 'default' => '/var/couchdb' },
+    'gentoo' => { 'default' => '/var/couchdb' },
+    'default' => '/var/lib/couchdb'
   )
 end
 
-service "couchdb" do
-  if platform?("centos","redhat","fedora")
-    start_command "/sbin/service couchdb start &> /dev/null"
-    stop_command "/sbin/service couchdb stop &> /dev/null"
+service 'couchdb' do
+  if platform_family?('rhel', 'fedora')
+    start_command '/sbin/service couchdb start &> /dev/null'
+    stop_command '/sbin/service couchdb stop &> /dev/null'
   end
-  supports [ :restart, :status ]
-  action [ :enable, :start ]
+  supports [:restart, :status]
+  action [:enable, :start]
 end

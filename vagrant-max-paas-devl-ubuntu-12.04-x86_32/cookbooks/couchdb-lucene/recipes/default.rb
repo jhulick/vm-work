@@ -2,7 +2,7 @@ chef_gem "inifile"
 
 require 'inifile'
 
-include_recipe 'couchdb'
+include_recipe 'couchdb::source'
 
 tmp_dir = node["couchdb_lucene"]["tmp_dir"]
 install_dir = node["couchdb_lucene"]["install_dir"]
