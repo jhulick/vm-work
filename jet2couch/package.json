@@ -1,0 +1,19 @@
+{
+    "name": "jet2couch",
+    "version": "0.0.1",
+    "description": "A command-line utility for Windows, that pushes a MS Access database to a CouchDB instance.",
+    "author": "Jeremy Hulick <jeremy.hulick@gmail.com>",
+    "keywords": ["ms access", "msaccess", "access", "microsoft access", "couch", "couchdb", "shell", "conversion"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jhulick/vm-work"
+    },
+    "bin": {
+        "jet2couch": "./jet2couch.js"
+    },
+    "dependencies": {
+        "rimraf": "2.0.2",
+        "csv": "0.0.13",
+        "felix-couchdb": "1.0.3"
+    }
+}

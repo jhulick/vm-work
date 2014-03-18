@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+  jet2couch.hta
+  Author: Jeremy Hulick (jeremy.hulick@gmail.com)
+-->
+<head>
+<hta:application id="jet2couch"
+  applicationName="jet2couch.hta"
+  version="0.0.2"
+  border="dialog"
+  maximizebutton="no"
+  minimizebutton="no"
+  scroll="no"
+  selection="no"
+/>
+<title>jet2couch</title>
+<style type="text/css">
+body {
+  background-color: Menu;
+  font-family: sans-serif;
+  font-size: 10pt;
+}
+.btn {
+  width: 75px;
+}
+.result {
+  background-color: Menu;
+  font-family: monospace;
+  width: 341px;
+}
+td.right {
+  text-align: right;
+}
+textarea {
+  width: 100%;
+  height: 260px;
+
+}
+</style>
+<script language="JavaScript">
+// Defines the application window's size.
+var APP_HEIGHT = 495,
+    APP_WIDTH  = 505
+
+
+function log(str) {
+    var textarea = document.getElementById('log') 
+    textarea.value += str + "\n"
+    textarea.scrollTop = textarea.scrollHeight;
+}
+
+function ForceRefresh() {
+    var shell = new ActiveXObject("WScript.Shell")
+    shell.Run("cmd /c", 0, true)
+}
+
+// http://msdn.microsoft.com/en-us/library/312a5kbt(v=vs.84).aspx
+function readLine(stdout) {
+    // use Read(chars) instead of ReadLine(), because ReadLine()
+    // stalls the interface really badly
+    var line = ''
+    do {
+        line += stdout.Read(1)
+    } while(!stdout.AtEndOfLine);
+
+    return line
+}
+
+function exec(cmd, cb, done) {
+    var shell = new ActiveXObject("WScript.Shell")
+    var e = shell.Exec("%comspec% /c " + cmd + " 2>&1")
+
+    // check every 100ms if our line has changed, 
+    // and if we ended the stream
+    var all = ''
+
+    function ping() {
+        var line = e.StdOut.ReadLine()
+        if(cb) cb(line)
+        all += trim(line)
+        if(e.StdOut.AtEndOfStream) {
+            if(done) done(all)
+            return;
+        }
+        // re-schedule
+        setTimeout(ping, 100)
+    }
+    ping()
+}
+
+// Initializes the application.
+function initialize() {
+    window.resizeTo(APP_WIDTH, APP_HEIGHT)
+    window.moveTo((screen.width - APP_WIDTH) / 2, (screen.height - APP_HEIGHT) / 2)
+
+}
+
+function trim(str) {
+    return str.replace(/^\s+|\s+$/g, "")
+}
+function startsWith(data, input) {
+    return data.substring(0, input.length) === input
+}
+function parseTables(str) {
+    str = str.split(',')
+    var arr = []
+    for(var i in str) {
+        str[i] = trim(str[i])
+        arr.push('"' + str[i] + '"')
+    }
+
+    return arr.join(" ")
+}
+
+function updates() {
+    log('Checking if Node.js is installed')
+    exec('node -v', false, function(res) {
+        if(!startsWith(res, 'v')) {
+            log("You don't have Node.js installed. Install it from http://nodejs.org")
+            return;
+        }
+
+        log('Checking if jet2couch is installed')
+        exec('jet2couch', false, function(res) {
+            if(startsWith(res, "'jet2couch'")) {
+                log("jet2couch is not installed. Installing...")
+                exec('npm install jet2couch -g', false, function(r) {
+                    log(r)
+                })
+            } else { // it's installed, check updates
+                log('Checking jet2couch updates')
+                exec('npm update jet2couch -g', false, function(r) {
+                    log(r)
+                })
+            }
+        })
+    })
+}
+
+function submit() {
+    var accessDbPath = document.getElementById('access_database').value
+    if(accessDbPath) accessDbPath = '"' + accessDbPath + '"'
+    var tables = document.getElementById('access_tables').value
+    if(tables) parseTables(tables)
+    var couchDbUrl = document.getElementById('couch_server').value
+
+    log('Running export...')
+    exec('jet2couch ' + accessDbPath + ' ' + tables + ' ' + couchDbUrl, function(line) {
+        log(line)
+    })
+}
+
+</script>
+</head>
+<body onload="initialize();">
+
+<div style="float: left;">
+
+<div style="float: left; padding-bottom: 3px;">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>Access Database:</td>
+    <td style="padding-left: 4px;">
+      <input type="file" id="access_database" style="font-family: monospace; width: 346px;" />
+    </td>
+  </tr>
+  <tr>
+    <td>Tables (comma separated):</td>
+    <td style="padding-left: 4px;">
+      <input type="text" id="access_tables" style="font-family: monospace; width: 346px;" value="MISSIONS_SAMPLES_SITES" />
+    </td>
+  </tr>
+  <tr>
+    <td>CouchDB server:</td>
+    <td style="padding-left: 4px;">
+      <input type="text" id="couch_server" style="font-family: monospace; width: 346px;" value="http://192.168.20.251:5984/geosite" />
+    </td>
+  </tr>
+</table>
+</div>
+
+<p style="clear: both; margin: 10px 0 0 0;"></p>
+
+<fieldset style="padding: 5px 5px 5px 5px;">
+<legend>&nbsp;Log&nbsp;</legend>
+<textarea id="log" readonly="readonly"></textarea>
+
+</fieldset>
+
+<div style="padding-top: 15px; text-align: left; float: left;">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <input type="button" value="Check for Updates" style="width: auto" class="btn" onclick="updates();" />&nbsp;
+    </td>
+  </tr>
+</table>
+</div>
+<div style="padding-top: 15px; text-align: right;">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <input type="button" value="Submit" class="btn" onclick="submit();" />&nbsp;
+      <input type="button" value="Exit" class="btn" onclick="window.close();" />
+    </td>
+  </tr>
+</table>
+</div>
+
+</body>
+</html>
+
