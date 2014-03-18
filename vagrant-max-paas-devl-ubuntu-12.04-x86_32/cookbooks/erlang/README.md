@@ -1,62 +1,31 @@
-Description
-===========
+# Erlang Chef Cookbook
 
-Manages installation of erlang packages. For Debian/Ubuntu this means
-the distro version of 'erlang'. For RHEL/CentOS this means following
-the recommendation of RabbitMQ.com and adds an updated version of
-erlang and access to the EPEL Yum repository.
+This is a yet another OpsCode Chef cookbook for Erlang.
 
-http://www.rabbitmq.com/server.html
+It uses [Erlang Solutions apt repository](http://www.erlang-solutions.com/section/132/download-erlang-otp) to provide Erlang/OTP R15B01.
 
-Requirements
-============
+## Recipes
 
-Platform
---------
+Main recipe is `erlang::esl`.
 
-Tested on:
 
-* Ubuntu 10.04, 11.10
-* CentOS 5.7, 6.2
+## Attributes
 
-May work on other Debian/RHEL derivatives w/o modification.
+None at the moment.
 
-Cookbooks
----------
 
-* yum (for epel recipe)
+## Supported OSes
 
-Attributes
-==========
+Debian and Ubuntu (any version that was released in the last 1-2 years should work fine).
 
-* `node['erlang']['gui_tools']` - whether to install the GUI tools for
-  Erlang.
 
-Recipes
-=======
+## Dependencies
 
-default
--------
+None.
 
-Manages installation of erlang packages.
 
-License and Author
-==================
+## Copyright & License
 
-Author: Joe Williams (<joe@joetify.com>)
-Author: Joshua Timberman (<joshua@opscode.com>)
-Author: Matt Ray (<matt@opscode.com>)
+Michael S. Klishin, 2012.
 
-Copyright 2011-2012, Opscode, Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Released under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).

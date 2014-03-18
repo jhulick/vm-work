@@ -1,21 +1,11 @@
-name              'erlang'
-maintainer        'Opscode, Inc.'
-maintainer_email  'cookbooks@opscode.com'
-license           'Apache 2.0'
-description       'Installs erlang, optionally install GUI tools.'
-version           '1.4.3'
+maintainer        "Michael S. Klishin"
+maintainer_email  "michael@novemberain.com"
+license           "Apache 2.0"
+description       "Installs recent Erlang/OTP version using Erlang Solutions apt repository"
+version           "1.0.0"
 
-depends           'apt', '>= 1.7.0'
-depends           'yum', '~> 3.0'
-depends           'yum-epel'
-depends           'yum-erlang_solutions'
-depends           'build-essential'
+recipe "erlang::esl", "Installs Erlang using Erlang Solutions apt repository"
 
-recipe 'erlang', 'Installs Erlang via native package, source, or Erlang Solutions package'
-recipe 'erlang::package', 'Installs Erlang via native package'
-recipe 'erlang::source', 'Installs Erlang via source'
-recipe 'erlang::esl', "Installs Erlang from Erlang Solutions' package repositories"
-
-%w{ ubuntu debian redhat centos scientific amazon oracle }.each do |os|
+%w{ ubuntu debian }.each do |os|
   supports os
 end

@@ -66,6 +66,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             'karmi/elasticsearch-paramedic' => {},
             'lukas-vlcek/bigdesk'           => { 'version' => '1.0.0' }
           }
+      },
+      'erlang' => {
+          'esl' => { 'version' => 'R15B03' }
       }
     }
 
@@ -87,8 +90,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'recipe[java::default]',
       'recipe[openssl]',
       'recipe[tomcat::default]',
-      'recipe[elasticsearch]',
-      'recipe[mysql::server]'
+      'recipe[couchdb-lucene]'
+      #'recipe[elasticsearch]',
+      #'recipe[mysql::server]'
     ]
 
   end
