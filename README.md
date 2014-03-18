@@ -58,6 +58,9 @@ for Veewee are well documented in the repository.
   - Nginx
   - Java 7
   - Tomcat 7
+  - CouchDB
+  - Lucene
+  - Elasticsearch
   - Ant
   - Maven
   - NVM
