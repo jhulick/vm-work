@@ -34,6 +34,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Tomcat forwarded port
   config.vm.network :forwarded_port, guest: 8080, host: 4880
 
+  # CouchDB forwarded port
+  config.vm.network :forwarded_port, guest: 5984, host: 4884
+
   # Nginx forwarded port
   config.vm.network :forwarded_port, guest: 80, host: 8000
 
@@ -69,6 +72,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       },
       'erlang' => {
           'esl' => { 'version' => 'R15B03' }
+      },
+      'couch_db' => {
+          'config' => {
+              'httpd' => { 'bind_address'  => '0.0.0.0' }
+          }
       }
     }
 
