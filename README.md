@@ -44,6 +44,23 @@ for Veewee are well documented in the repository.
      $ git clone http://gitlab.rcs.cm.netspective.com/max-paas/max-navigation.git
      $ vagrant up
 
+
+## Windows Users
+
+For share folders to work properly between your Windows Host and the VM, you will need to install the Vagrant WinNFSd plugin.
+
+     $ vagrant plugin install vagrant-winnfsd
+
+To activate NFS for vagrant see: http://docs.vagrantup.com/v2/synced-folders/nfs.html
+
+The plugin extends vagrant in the way that you can use NFS also with windows. So the following hint on the vagrant documentation page is no longer true.
+
+```
+Windows users: NFS folders do not work on Windows hosts. Vagrant will ignore your request for NFS synced folders on Windows.
+```
+
+Further details can be found here: http://www.jankowfsky.com/blog/2013/11/28/nfs-for-vagrant-under-windows/
+
 ### Server CentOS Installation
 
   With [Vagrant](http://http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) previously installed:
