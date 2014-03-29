@@ -45,7 +45,7 @@ for Veewee are well documented in the repository.
      $ vagrant up
 
 
-## Windows Users
+### Windows Users
 
 For share folders to work properly between your Windows Host and the VM, you will need to install the Vagrant WinNFSd plugin.
 
