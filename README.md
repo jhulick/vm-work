@@ -45,6 +45,51 @@ for Veewee are well documented in the repository.
      $ vagrant up
 
 
+#### Install Gnome Desktop (not required)
+
+     $ vagrant up
+     $ vagrant ssh
+
+  Install XFCE
+
+     $ sudo apt-get install xfce4
+
+  Install Gnome
+
+     $ sudo apt-get update
+     $ sudo apt-get install gnome-shell
+     $ sudo apt-get install ubuntu-desktop
+
+  Install GDM, which will let you boot directly into a graphical environment (or lightDM)
+
+     $ sudo apt-get install gdm
+     $ sudo dpkg-reconfigure gdm
+
+  From /home/vagrant
+
+     $ sudo chown vagrant:vagrant .config
+     $ sudo chown vagrant:vagrant .ICEauthority
+
+  Stop and update Vagrant file
+
+     $ exit
+     $ vagrant halt
+
+  Modify the Vagrant file, in the provider block
+
+     ## Uncomment lines below for Gnome settings ##
+
+     #vb.gui = true
+     #vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+     #vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+     #vb.customize ["modifyvm", :id, "--ioapic", "on"]
+     #vb.customize ["modifyvm", :id, "--vram", "128"]
+     #vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+
+  Reload the Vagrant file
+
+     $ vagrant reload
+
 ## Windows Users
 
 For share folders to work properly between your Windows Host and the VM, you will need to install the Vagrant WinNFSd plugin.
