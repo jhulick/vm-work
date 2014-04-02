@@ -79,12 +79,12 @@ for Veewee are well documented in the repository.
 
      ## Uncomment lines below for Gnome settings ##
 
-     #vb.gui = true
-     #vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
-     #vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-     #vb.customize ["modifyvm", :id, "--ioapic", "on"]
-     #vb.customize ["modifyvm", :id, "--vram", "128"]
-     #vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+     vb.gui = true
+     vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+     vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+     vb.customize ["modifyvm", :id, "--ioapic", "on"]
+     vb.customize ["modifyvm", :id, "--vram", "128"]
+     vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
 
   Reload the Vagrant file
 
