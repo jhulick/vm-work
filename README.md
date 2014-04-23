@@ -120,7 +120,7 @@ Further details can be found here: http://www.jankowfsky.com/blog/2013/11/28/nfs
 
   - Nginx
   - Java 7
-  - Tomcat 7
+  - Tomcat
   - CouchDB 1.5.0
   - Erlang ESL
   - Lucene
