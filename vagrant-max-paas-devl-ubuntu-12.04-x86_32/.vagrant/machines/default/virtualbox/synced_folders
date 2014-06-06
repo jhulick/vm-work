@@ -1,0 +1,1 @@
+{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/jeremyhulick/projects/max/vm-work/vagrant-max-paas-devl-ubuntu-12.04-x86_32","disabled":false},"v-csc-1":{"id":"v-csc-1","guestpath":"/tmp/vagrant-chef-solo/chef-solo-1/cookbooks","hostpath":"/Users/jeremyhulick/projects/max/vm-work/vagrant-max-paas-devl-ubuntu-12.04-x86_32/cookbooks","disabled":false}}}

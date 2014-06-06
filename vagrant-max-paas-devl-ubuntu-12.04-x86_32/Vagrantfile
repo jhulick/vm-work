@@ -70,9 +70,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             'lukas-vlcek/bigdesk'           => { 'version' => '1.0.0' }
           }
       },
-      'erlang' => {
-          'esl' => { 'version' => 'R15B03' }
-      },
+      #'erlang' => {
+      #    'esl' => { 'version' => 'R15B03' }
+      #},
       'couch_db' => {
           'config' => {
               'httpd' => { 'bind_address'  => '0.0.0.0' }
@@ -98,7 +98,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       'recipe[java::default]',
       'recipe[openssl]',
       'recipe[tomcat::default]',
-      'recipe[couchdb-lucene]'
+      'recipe[couchdb]'
       #'recipe[elasticsearch]',
       #'recipe[mysql::server]'
     ]
