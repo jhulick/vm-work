@@ -35,6 +35,7 @@ when 'debian'
     'debian' => { 'default' => 'libmozjs-dev' },
     'ubuntu' => {
       '10.04' => 'xulrunner-dev',
+      '14.04' => 'libmozjs185-dev',
       'default' => 'libmozjs-dev'
     }
   )
@@ -52,7 +53,7 @@ when 'rhel', 'fedora'
   compile_flags = "--with-erlang=/usr/#{bitness}/erlang/usr/include"
 end
 
-include_recipe 'erlang::esl' if node['couch_db']['install_erlang']
+include_recipe 'erlang' if node['couch_db']['install_erlang']
 
 dev_pkgs.each do |pkg|
   package pkg
