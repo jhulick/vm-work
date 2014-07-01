@@ -1,172 +1,141 @@
-Tomcat Puppet module
-====================
+# Puppet module: tomcat
 
-[![Build Status](https://travis-ci.org/camptocamp/puppet-tomcat.png?branch=master)](https://travis-ci.org/camptocamp/puppet-tomcat)
+This is a Puppet tomcat module from the second generation of Example42 Puppet Modules.
 
-**Manages Tomcat configuration.**
+Made by Alessandro Franceschi / Lab42
 
-This module is provided by [Camptocamp](http://camptocamp.com/).
+Official site: http://www.example42.com
 
-This module will install tomcat, either using you system's package
-manager or from a compressed archive available on one of the
-tomcat-mirrors.
+Official git repository: http://github.com/example42/puppet-tomcat
 
-This is done by including the tomcat class for a package based setup
-or declaring the class with the parameter sources => true for a source
-based setup.
+Released under the terms of Apache 2 License.
 
-Instances
----------
+This module requires functions provided by the Example42 Puppi module.
 
-You'll then be able to define one or more tomcat instances, where you
-can drop your webapps in the ".war" format. This is done with the
-`tomcat::instance` definition.
+For detailed info about the logic and usage patterns of Example42 modules read README.usage on Example42 main modules set.
 
-The idea is to have several independent tomcats running on the same
-host, each of which can be restarted and managed independently. If one
-of them happens to crash, it won't affect the other instances. The
-drawback is that each tomcat instance starts it's own JVM, which
-consumes memory.
+## USAGE - Basic management
 
-This is implemented by having a shared `$CATALINA_HOME`, and each
-instance having it's own `$CATALINA_BASE`. More details are found in
-this document:
-[http://tomcat.apache.org/tomcat-6.0-doc/RUNNING.txt](http://tomcat.apache.org/tomcat-6.0-doc/RUNNING.txt)
+* Install tomcat with default settings
 
-Logging
--------
+        class { "tomcat": }
 
-To offer more flexibility and avoid having to restart tomcat each time
-catalina.out is rotated, tomcat is configured to send it's log messages
-to log4j. By default log4j is configured to send all log messages from
-all instances to /var/log/tomcat/tomcat.log.
+* Disable tomcat service and create single tomcat instances (note for each for them you must specify (different) http_port and control_port
 
-This can easily be overridden on an instance base by creating a custom
-log4j.properties file and setting the `common.loader` path to point to
-it, by editing `/srv/tomcat/<name>/conf/catalina.properties`.
+        class { "tomcat":
+          disable => true
+        }
 
-Defaults
---------
+        tomcat::instance { 'my_app':
+          http_port    => '8088',
+          control_port => '6088',
+        }
 
-By default a new tomcat instance create by a tomcat::instance resource
-will listen on the following ports:
+        tomcat::instance { 'other_app':
+          http_port    => '8089',
+          control_port => '6089',
+          ajp_port     => '9089',
+        }
 
- -   8080 HTTP
- -   8005 Control
- -   8009 AJP
+* Disable tomcat service at boot time, but don't stop if is running.
 
-You should override these defaults by setting attributes `server_port`,
-`http_port` and `ajp_port`.
+        class { "tomcat":
+          disableboot => true
+        }
 
-Limitations
------------
+* Remove tomcat package
 
- -   there is no way to automatically manage webapps (`\*.war` files).
- -   the initscript calls catalina.sh instead of using jsvc. This
-     prevents tomcat from listening on ports < 1024.
+        class { "tomcat":
+          absent => true
+        }
 
-Examples
---------
+* Enable auditing without making changes on existing tomcat configuration files
 
-**Simple standalone instance:**
+        class { "tomcat":
+          audit_only => true
+        }
 
-Create a standalone tomcat instance whose HTTP server listen on port
-8080:
+* Install a custom version of tomcat. The default is chose according to OS versions, but you can try to install a different one (given that a tomcat${version} packge is available)
 
-    include tomcat
+        class { "tomcat": }
 
-    tomcat::instance {'myapp':
-      ensure    => present,
-      http_port => '8080',
-    }
+        On hiera set this key with the version value you want:
+        tomcat::params::version: 7
 
-If you want to install a specific tomcat version from a specific mirror:
+Note: that some templates used by tomcat::instance may not be present for your version. You should provide them with the *_template parameters.
 
-    $tomcat_mirror = 'http://archive.apache.org/dist/tomcat/'
-    $tomcat_version = '6.0.32'
-    include tomcat::source
+## USAGE - Overrides and Customizations
+* Use custom sources for main config file 
 
-Apache integration
-------------------
+        class { "tomcat":
+          source => [ "puppet:///modules/lab42/tomcat/tomcat.conf-${hostname}" , "puppet:///modules/lab42/tomcat/tomcat.conf" ], 
+        }
 
-Pre-requisites:
 
-    include apache_c2c
+* Use custom source directory for the whole configuration dir
 
-    apache_c2c::module {'proxy_ajp':
-      ensure  => present,
-    }
+        class { "tomcat":
+          source_dir       => "puppet:///modules/lab42/tomcat/conf/",
+          source_dir_purge => false, # Set to true to purge any existing file not present in $source_dir
+        }
 
-    apache_c2c::vhost {'www.mycompany.com':
-      ensure => present,
-    }
+* Use custom template for main config file 
 
-Create a tomcat instance which is accessible via Apache using AJP on a
-given virtualhost:
+        class { "tomcat":
+          template => "example42/tomcat/tomcat.conf.erb",      
+        }
 
-    include tomcat
+* Define custom options that can be used in a custom template without the
+  need to add parameters to the tomcat class
 
-    tomcat::instance {'myapp':
-      ensure      => present,
-      ajp_port    => '8000'
-    }
+        class { "tomcat":
+          template => "example42/tomcat/tomcat.conf.erb",    
+          options  => {
+            'LogLevel' => 'INFO',
+            'UsePAM'   => 'yes',
+          },
+        }
 
-    apache_c2c::proxypass {'myapp':
-      ensure   => present,
-      location => '/myapp',
-      vhost    => 'www.mycompany.com',
-      url      => 'ajp://localhost:8000',
-    }
+* Automaticallly include a custom subclass
 
-Multiple instances
-------------------
+        class { "tomcat:"
+          my_class => 'tomcat::example42',
+        }
 
-If you create multiple Tomcat instances, you must avoid port clash by
-setting distinct ports for each instance:
 
-    include tomcat
+## USAGE - Example42 extensions management 
+* Activate puppi (recommended, but disabled by default)
+  Note that this option requires the usage of Example42 puppi module
 
-    tomcat::instance {'tomcat1':
-      ensure      => present,
-      server_port => '8005',
-      http_port   => '8080',
-      ajp_port    => '8009',
-    }
+        class { "tomcat": 
+          puppi    => true,
+        }
 
-    tomcat::instance {'tomcat2':
-      ensure      => present,
-      server_port => '8006',
-      http_port   => '8081',
-      ajp_port    => '8010',
-    }
+* Activate puppi and use a custom puppi_helper template (to be provided separately with
+  a puppi::helper define ) to customize the output of puppi commands 
 
-Create a tomcat instance with custom connectors
------------------------------------------------
+        class { "tomcat":
+          puppi        => true,
+          puppi_helper => "myhelper", 
+        }
 
-First you have to declare you connectors then they are added to the
-tomcat-instance:
+* Activate automatic monitoring (recommended, but disabled by default)
+  This option requires the usage of Example42 monitor and relevant monitor tools modules
 
-    include tomcat
+        class { "tomcat":
+          monitor      => true,
+          monitor_tool => [ "nagios" , "monit" , "munin" ],
+        }
 
-    tomcat::connector{'http-8080':
-      ensure   => present,
-      instance => 'tomcat1',
-      protocol => 'HTTP/1.1',
-      port     => 8080,
-      manage   => true,
-    }
+* Activate automatic firewalling 
+  This option requires the usage of Example42 firewall and relevant firewall tools modules
 
-    tomcat::connector{'ajp-8081':
-      ensure   => present
-      instance => 'tomcat1'
-      protocol => 'AJP/1.3',
-      port     => 8081,
-      manage   => true,
-    }
+        class { "tomcat":       
+          firewall      => true,
+          firewall_tool => "iptables",
+          firewall_src  => "10.42.0.0/24",
+          firewall_dst  => "$ipaddress_eth0",
+        }
 
-    tomcat::instance {'tomcat1':
-      ensure    => present,
-      group     => 'tomcat-admin',
-      manage    => true,
-      connector => ['http-8080','ajp-8081'],
-    }
+
+[![Build Status](https://travis-ci.org/example42/puppet-tomcat.png?branch=master)](https://travis-ci.org/example42/puppet-tomcat)
