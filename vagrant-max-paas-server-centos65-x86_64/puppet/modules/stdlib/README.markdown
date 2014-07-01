@@ -145,6 +145,11 @@ Would result in:
 
   ['1','2','3','4','5','6']
 
+  concat(['1','2','3'],'4')
+
+Would result in:
+
+  ['1','2','3','4']
 
 - *Type*: rvalue
 
@@ -275,6 +280,8 @@ Returns true if the variable is empty.
 ensure_packages
 ---------------
 Takes a list of packages and only installs them if they don't already exist.
+It optionally takes a hash as a second parameter that will be passed as the
+third argument to the ensure_resource() function.
 
 
 - *Type*: statement
@@ -650,8 +657,8 @@ Merges two or more hashes together and returns the resulting hash.
 
 For example:
 
-    $hash1 = {'one' => 1, 'two', => 2}
-    $hash2 = {'two' => 'dos', 'three', => 'tres'}
+    $hash1 = {'one' => 1, 'two' => 2}
+    $hash2 = {'two' => 'dos', 'three' => 'tres'}
     $merged_hash = merge($hash1, $hash2)
     # The resulting hash is equivalent to:
     # $merged_hash =  {'one' => 1, 'two' => 'dos', 'three' => 'tres'}
@@ -717,6 +724,27 @@ This function applies a prefix to all elements in an array.
 Will return: ['pa','pb','pc']
 
 - *Type*: rvalue
+
+
+private
+-------
+This function sets the current class or definition as private.
+Calling the class or definition from outside the current module will fail.
+
+*Examples:*
+
+    private()
+
+called in class `foo::bar` will output the following message if class is called
+from outside module `foo`:
+
+    Class foo::bar is private
+
+You can specify the error message you want to use as a parameter:
+
+    private("You're not supposed to do that!")
+
+- *Type*: statement
 
 range
 -----
@@ -1199,13 +1227,13 @@ to a number.
 
 The following values will pass:
 
-  validate_slength("discombobulate",17)
-  validate_slength(["discombobulate","moo"],17)
+    validate_slength("discombobulate",17)
+    validate_slength(["discombobulate","moo"],17)
 
-The following valueis will not:
+The following values will not:
 
-  validate_slength("discombobulate",1)
-  validate_slength(["discombobulate","thermometer"],5)
+    validate_slength("discombobulate",1)
+    validate_slength(["discombobulate","thermometer"],5)
 
 
 
